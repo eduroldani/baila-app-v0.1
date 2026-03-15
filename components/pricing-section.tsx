@@ -14,7 +14,7 @@ export function PricingSection({ pricingByPaymentMethod }: { pricingByPaymentMet
 
   return (
     <section id="precios" className="mx-auto max-w-5xl px-6 pb-24 lg:px-8">
-      <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8">
+      <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8 shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
         <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.3em] text-black">Precios</p>
@@ -40,7 +40,7 @@ export function PricingSection({ pricingByPaymentMethod }: { pricingByPaymentMet
                   onClick={() => setPaymentMethod(tab.id)}
                   className={`min-w-[148px] rounded-xl px-5 py-3 text-sm font-semibold transition ${
                     isActive
-                      ? "bg-[#F797A5] text-white shadow-sm"
+                      ? "bg-[#F797A5] text-white shadow-[0_6px_18px_rgba(0,0,0,0.08)]"
                       : "text-black/55 hover:bg-stone-100 hover:text-black"
                   }`}
                 >
@@ -51,7 +51,7 @@ export function PricingSection({ pricingByPaymentMethod }: { pricingByPaymentMet
           </div>
         </div>
 
-        <div className="mt-8 rounded-3xl border border-black/10 bg-white px-5 py-4">
+        <div className="mt-8 rounded-3xl border border-black/10 bg-white px-5 py-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
           <p className="text-sm font-medium text-black">
             Viendo precios para:{" "}
             <span className="font-semibold">
@@ -62,7 +62,7 @@ export function PricingSection({ pricingByPaymentMethod }: { pricingByPaymentMet
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {plans.map((plan) => (
-            <article key={plan.name} className="rounded-3xl border border-black/10 bg-white p-6">
+            <article key={plan.name} className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
               <p className="text-sm uppercase tracking-[0.25em] text-black/55">{plan.name}</p>
               <p className="mt-4 text-4xl font-semibold text-black">{plan.price}</p>
               <p className="mt-4 text-sm leading-6 text-black/65">{plan.description}</p>

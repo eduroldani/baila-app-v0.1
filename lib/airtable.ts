@@ -3,6 +3,7 @@ const fallbackClassesByDay = [
     day: "Lunes",
     classes: [
       {
+        id: "fallback-salsa-inicial",
         name: "Salsa Inicial",
         type: "Salsa",
         level: "Principiante",
@@ -18,6 +19,7 @@ const fallbackClassesByDay = [
     day: "Martes",
     classes: [
       {
+        id: "fallback-bachata-open",
         name: "Bachata Open",
         type: "Bachata",
         level: "Todos los niveles",
@@ -33,6 +35,7 @@ const fallbackClassesByDay = [
     day: "Miércoles",
     classes: [
       {
+        id: "fallback-heels-technique",
         name: "Heels Technique",
         type: "Heels",
         level: "Intermedio",
@@ -48,6 +51,7 @@ const fallbackClassesByDay = [
     day: "Jueves",
     classes: [
       {
+        id: "fallback-reggaeton-basics",
         name: "Reggaeton Basics",
         type: "Reggaeton",
         level: "Principiante",
@@ -63,6 +67,7 @@ const fallbackClassesByDay = [
     day: "Viernes",
     classes: [
       {
+        id: "fallback-contemporaneo-flow",
         name: "Contemporaneo Flow",
         type: "Contemporáneo",
         level: "Intermedio",
@@ -124,6 +129,7 @@ type AirtableResponse = {
 };
 
 type ClassItem = {
+  id: string;
   day: string;
   name: string;
   type: string;
@@ -138,6 +144,7 @@ type ClassItem = {
 export type ClassesByDay = {
   day: string;
   classes: {
+    id: string;
     name: string;
     type: string;
     level: string;
@@ -226,13 +233,6 @@ async function fetchAirtableRecords(tableId: string, view?: string) {
   const baseId = process.env.AIRTABLE_BASE_ID;
 
   if (!token || !baseId || !tableId) {
-    console.warn("[airtable] missing env", {
-      hasToken: Boolean(token),
-      hasBaseId: Boolean(baseId),
-      hasTableId: Boolean(tableId),
-      tableId,
-      view,
-    });
     return null;
   }
 
@@ -259,31 +259,14 @@ async function fetchAirtableRecords(tableId: string, view?: string) {
     );
 
     if (!response.ok) {
-      console.error("[airtable] fetch failed", {
-        tableId,
-        view,
-        status: response.status,
-        statusText: response.statusText,
-      });
       return null;
     }
 
     const data = (await response.json()) as AirtableResponse;
-    console.info("[airtable] page fetched", {
-      tableId,
-      view,
-      records: data.records?.length ?? 0,
-      hasOffset: Boolean(data.offset),
-    });
     records.push(...(data.records ?? []));
     offset = data.offset ?? "";
   } while (offset);
 
-  console.info("[airtable] fetch complete", {
-    tableId,
-    view,
-    totalRecords: records.length,
-  });
   return records;
 }
 
@@ -309,6 +292,7 @@ function normalizeClass(record: AirtableRecord): ClassItem | null {
   }
 
   return {
+    id: record.id,
     name,
     type,
     level,
@@ -326,6 +310,7 @@ function groupClassesByDay(classes: ClassItem[]): ClassesByDay[] {
     string,
     {
       name: string;
+      id: string;
       type: string;
       level: string;
       teacher: string;
@@ -339,6 +324,7 @@ function groupClassesByDay(classes: ClassItem[]): ClassesByDay[] {
   for (const danceClass of classes) {
     const existing = grouped.get(danceClass.day) ?? [];
     existing.push({
+      id: danceClass.id,
       name: danceClass.name,
       type: danceClass.type,
       level: danceClass.level,
@@ -393,7 +379,6 @@ export async function getClassesByDay(): Promise<ClassesByDay[]> {
   const view = process.env.AIRTABLE_VIEW;
 
   if (!tableId) {
-    console.warn("[airtable] classes table id missing, using fallback");
     return getFallbackClassesByDay();
   }
 
@@ -401,24 +386,17 @@ export async function getClassesByDay(): Promise<ClassesByDay[]> {
     const records = await fetchAirtableRecords(tableId, view);
 
     if (!records) {
-      console.warn("[airtable] classes fetch returned null, using fallback");
       return getFallbackClassesByDay();
     }
 
     const classes = records.map(normalizeClass).filter((value): value is ClassItem => value !== null);
 
     if (classes.length === 0) {
-      console.warn("[airtable] classes normalized empty, using fallback");
       return getFallbackClassesByDay();
     }
 
-    console.info("[airtable] classes ready", {
-      dayGroups: groupClassesByDay(classes).length,
-      classes: classes.length,
-    });
     return groupClassesByDay(classes);
-  } catch (error) {
-    console.error("[airtable] classes fetch crashed, using fallback", error);
+  } catch {
     return getFallbackClassesByDay();
   }
 }
@@ -474,7 +452,6 @@ export async function getPricingByPaymentMethod(): Promise<PricingByPaymentMetho
   const view = process.env.AIRTABLE_PRICING_VIEW;
 
   if (!tableId) {
-    console.warn("[airtable] pricing table id missing, using fallback");
     return getFallbackPricingByPaymentMethod();
   }
 
@@ -482,7 +459,6 @@ export async function getPricingByPaymentMethod(): Promise<PricingByPaymentMetho
     const records = await fetchAirtableRecords(tableId, view);
 
     if (!records) {
-      console.warn("[airtable] pricing fetch returned null, using fallback");
       return getFallbackPricingByPaymentMethod();
     }
 
@@ -491,7 +467,6 @@ export async function getPricingByPaymentMethod(): Promise<PricingByPaymentMetho
       .filter((value): value is NonNullable<ReturnType<typeof normalizePricingPlan>> => value !== null);
 
     if (normalizedPlans.length === 0) {
-      console.warn("[airtable] pricing normalized empty, using fallback");
       return getFallbackPricingByPaymentMethod();
     }
 
@@ -506,20 +481,11 @@ export async function getPricingByPaymentMethod(): Promise<PricingByPaymentMetho
     }
 
     if (grouped.transferencia.length === 0 || grouped.efectivo.length === 0) {
-      console.warn("[airtable] pricing missing one payment method, using fallback", {
-        transferencia: grouped.transferencia.length,
-        efectivo: grouped.efectivo.length,
-      });
       return getFallbackPricingByPaymentMethod();
     }
 
-    console.info("[airtable] pricing ready", {
-      transferencia: grouped.transferencia.length,
-      efectivo: grouped.efectivo.length,
-    });
     return grouped;
-  } catch (error) {
-    console.error("[airtable] pricing fetch crashed, using fallback", error);
+  } catch {
     return getFallbackPricingByPaymentMethod();
   }
 }

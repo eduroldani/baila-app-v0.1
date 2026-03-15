@@ -1,5 +1,7 @@
 import { getClassesByDay } from "@/lib/airtable";
 
+export const dynamic = "force-dynamic";
+
 export default async function ClassesPage() {
   const classesByDay = await getClassesByDay();
 
@@ -20,7 +22,10 @@ export default async function ClassesPage() {
       <section className="mx-auto max-w-5xl px-6 py-12 lg:px-8">
         <div className="mt-10 space-y-8">
           {classesByDay.map((dayGroup) => (
-            <section key={dayGroup.day} className="overflow-hidden rounded-3xl border border-black/10">
+            <section
+              key={dayGroup.day}
+              className="overflow-hidden rounded-3xl border border-black/10 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
+            >
               <div className="border-b border-black/10 bg-black px-6 py-4 text-white">
                 <h2 className="text-2xl font-semibold tracking-tight">{dayGroup.day}</h2>
               </div>
@@ -28,7 +33,10 @@ export default async function ClassesPage() {
               <div className="bg-white px-5 py-3 sm:px-6">
                 <div className="space-y-3">
                   {dayGroup.classes.map((danceClass) => (
-                    <article key={`${dayGroup.day}-${danceClass.name}`} className="rounded-2xl border border-black/10 px-4 py-4">
+                    <article
+                      key={`${dayGroup.day}-${danceClass.name}`}
+                      className="rounded-2xl border border-black/10 px-4 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.03)]"
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="text-base font-medium text-black sm:text-lg">{danceClass.name}</h3>

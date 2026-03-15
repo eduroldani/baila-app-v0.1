@@ -45,6 +45,12 @@ export function Navbar() {
               Alumnos
             </a>
             <Link
+              href="/acceso"
+              className="text-sm font-medium text-black/70 transition hover:text-black"
+            >
+              Acceso
+            </Link>
+            <Link
               href="/condiciones-generales"
               className="text-sm font-medium text-black/70 transition hover:text-black"
             >
@@ -61,13 +67,13 @@ export function Navbar() {
             </a>
             <Link
               href="/clases"
-              className="rounded-full border border-black/15 px-5 py-2 text-sm font-semibold text-black transition hover:bg-stone-100"
+              className="rounded-full border border-black/15 px-5 py-2 text-sm font-semibold text-black shadow-[0_6px_18px_rgba(0,0,0,0.06)] transition hover:bg-stone-100"
             >
               Ver clases
             </Link>
             <a
               href="/#precios"
-              className="rounded-full bg-[#F797A5] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#f27f92]"
+              className="rounded-full bg-[#F797A5] px-5 py-2 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition hover:bg-[#f27f92]"
             >
               Inscribirme
             </a>
@@ -88,7 +94,7 @@ export function Navbar() {
         </div>
 
         {isMenuOpen ? (
-          <nav className="mt-4 grid gap-2 rounded-3xl border border-black/10 bg-white p-3 md:hidden">
+          <nav className="mt-4 grid gap-2 rounded-3xl border border-black/10 bg-white p-3 shadow-[0_16px_40px_rgba(0,0,0,0.08)] md:hidden">
             <a
               href="/#precios"
               onClick={() => setIsMenuOpen(false)}
@@ -103,6 +109,13 @@ export function Navbar() {
             >
               Área alumnos
             </a>
+            <Link
+              href="/acceso"
+              onClick={() => setIsMenuOpen(false)}
+              className="rounded-2xl px-4 py-3 text-sm font-medium text-black transition hover:bg-stone-100"
+            >
+              Acceso
+            </Link>
             <Link
               href="/condiciones-generales"
               onClick={() => setIsMenuOpen(false)}
@@ -123,14 +136,14 @@ export function Navbar() {
             <Link
               href="/clases"
               onClick={() => setIsMenuOpen(false)}
-              className="rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold text-black transition hover:bg-stone-100"
+              className="rounded-2xl border border-black/10 px-4 py-3 text-sm font-semibold text-black shadow-[0_6px_18px_rgba(0,0,0,0.05)] transition hover:bg-stone-100"
             >
               Ver clases
             </Link>
             <a
               href="/#precios"
               onClick={() => setIsMenuOpen(false)}
-              className="rounded-2xl bg-[#F797A5] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#f27f92]"
+              className="rounded-2xl bg-[#F797A5] px-4 py-3 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition hover:bg-[#f27f92]"
             >
               Inscribirme
             </a>

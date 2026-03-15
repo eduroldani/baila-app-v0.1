@@ -65,13 +65,16 @@ export default function TermsPage() {
       </section>
 
       <section className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
-        <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8">
+        <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8 shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
           <p className="text-sm font-medium uppercase tracking-[0.3em] text-black/55">
             Para tener en cuenta
           </p>
           <div className="mt-8 space-y-6">
             {sections.map((section) => (
-              <section key={section.title} className="rounded-3xl border border-black/10 bg-white p-6">
+              <section
+                key={section.title}
+                className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
+              >
                 <h2 className="text-xl font-semibold">{section.title}</h2>
                 <ul className="mt-4 space-y-3 text-sm leading-7 text-black/70">
                   {section.items.map((item) => (

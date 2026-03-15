@@ -2,6 +2,8 @@ import Link from "next/link";
 import { PricingSection } from "@/components/pricing-section";
 import { flattenClasses, getClassesByDay, getPricingByPaymentMethod } from "@/lib/airtable";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const classesByDay = await getClassesByDay();
   const pricingByPaymentMethod = await getPricingByPaymentMethod();
@@ -26,7 +28,7 @@ export default async function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/clases"
-                className="rounded-full bg-[#F797A5] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#f27f92]"
+                className="rounded-full bg-[#F797A5] px-6 py-3 text-center text-sm font-semibold text-white shadow-[0_6px_18px_rgba(0,0,0,0.08)] transition hover:bg-[#f27f92]"
               >
                 Ver clases disponibles
               </Link>
@@ -61,7 +63,7 @@ export default async function Home() {
           {featuredClasses.map((danceClass) => (
             <article
               key={`${danceClass.day}-${danceClass.name}-summary`}
-              className="rounded-3xl border border-black/10 p-6"
+              className="rounded-3xl border border-black/10 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]"
             >
               <p className="text-sm text-black/50">{danceClass.day}</p>
               <h3 className="mt-2 text-xl font-semibold">{danceClass.name}</h3>
@@ -76,7 +78,7 @@ export default async function Home() {
       <PricingSection pricingByPaymentMethod={pricingByPaymentMethod} />
 
       <section id="alumnos" className="mx-auto max-w-5xl px-6 pb-20 pt-6 lg:px-8">
-        <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8">
+        <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8 shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
           <div className="grid gap-8 md:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.3em] text-black">
@@ -87,7 +89,7 @@ export default async function Home() {
               </h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <article className="rounded-3xl border border-black/10 bg-white p-6">
+              <article className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
                 <h3 className="text-lg font-semibold">Subir comprobante</h3>
                 <p className="mt-3 text-sm leading-6 text-black/65">
                   Si ya sos alumno, podés enviar tu comprobante de pago para validar la inscripción.
@@ -96,12 +98,12 @@ export default async function Home() {
                   href="https://wa.me/5490000000000?text=Hola%2C%20quiero%20enviar%20mi%20comprobante%20de%20pago."
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-5 inline-flex rounded-full border border-black px-4 py-2 text-sm font-semibold transition hover:bg-black hover:text-white"
+                  className="mt-5 inline-flex rounded-full border border-black px-4 py-2 text-sm font-semibold shadow-[0_6px_18px_rgba(0,0,0,0.06)] transition hover:bg-black hover:text-white"
                 >
                   Enviar comprobante
                 </a>
               </article>
-              <article className="rounded-3xl border border-black/10 bg-white p-6">
+              <article className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
                 <h3 className="text-lg font-semibold">Subir certificado médico</h3>
                 <p className="mt-3 text-sm leading-6 text-black/65">
                   También podés enviar tu certificado médico para mantener tu ficha actualizada.
@@ -110,7 +112,7 @@ export default async function Home() {
                   href="https://wa.me/5490000000000?text=Hola%2C%20quiero%20enviar%20mi%20certificado%20m%C3%A9dico."
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-5 inline-flex rounded-full border border-black px-4 py-2 text-sm font-semibold transition hover:bg-black hover:text-white"
+                  className="mt-5 inline-flex rounded-full border border-black px-4 py-2 text-sm font-semibold shadow-[0_6px_18px_rgba(0,0,0,0.06)] transition hover:bg-black hover:text-white"
                 >
                   Enviar certificado
                 </a>
