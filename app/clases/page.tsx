@@ -11,7 +11,7 @@ export default async function ClassesPage() {
             <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Clases disponibles</h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-black/65">
               Agenda semanal conectada a Airtable. Cada bloque muestra la clase, el horario, el
-              nivel y el profesor asignado.
+              nivel, el profesor y la ubicación asignada.
             </p>
           </div>
         </div>
@@ -33,7 +33,7 @@ export default async function ClassesPage() {
                         <div>
                           <h3 className="text-base font-medium text-black sm:text-lg">{danceClass.name}</h3>
                           <div className="mt-2 flex flex-wrap gap-2">
-                            <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+                            <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-black">
                               {danceClass.level || "Nivel a definir"}
                             </span>
                             {danceClass.type ? (
@@ -42,18 +42,25 @@ export default async function ClassesPage() {
                               </span>
                             ) : null}
                           </div>
+                          {danceClass.location ? (
+                            <p className="mt-3 text-sm font-medium text-black/75">
+                              Ubicación: <span className="text-black">{danceClass.location}</span>
+                            </p>
+                          ) : null}
                         </div>
                         <p className="shrink-0 text-sm font-medium text-black/65">{danceClass.time}</p>
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-4">
-                        <p className="text-sm text-black/65">
-                          Profesor: <span className="font-medium text-black">{danceClass.teacher || "A confirmar"}</span>
-                        </p>
+                        <div className="space-y-1 text-sm text-black/65">
+                          <p>
+                            Profesor: <span className="font-medium text-black">{danceClass.teacher || "A confirmar"}</span>
+                          </p>
+                        </div>
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${
                             danceClass.isAvailable && (danceClass.availableSpots ?? 1) > 0
-                              ? "bg-emerald-50 text-emerald-700"
-                              : "bg-red-50 text-red-700"
+                              ? "bg-stone-100 text-black"
+                              : "bg-[#F797A5] text-white"
                           }`}
                         >
                           {danceClass.isAvailable && (danceClass.availableSpots ?? 1) > 0

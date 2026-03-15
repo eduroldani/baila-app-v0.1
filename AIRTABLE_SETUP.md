@@ -1,6 +1,7 @@
 # Airtable Setup
 
 La página `/clases` puede leer datos desde Airtable del lado del servidor.
+La sección de precios también puede leer desde otra tabla de Airtable.
 
 ## Variables de entorno
 
@@ -11,6 +12,8 @@ AIRTABLE_TOKEN=tu_personal_access_token
 AIRTABLE_BASE_ID=appXXXXXXXXXXXXXX
 AIRTABLE_TABLE_ID=Clases
 AIRTABLE_VIEW=Grid view
+AIRTABLE_PRICING_TABLE_ID=Precios
+AIRTABLE_PRICING_VIEW=Grid view
 ```
 
 `AIRTABLE_TABLE_ID` puede ser el nombre de la tabla o el table id.
@@ -24,6 +27,15 @@ La integración busca estos nombres de campos:
 - horario: `Horario`, `Hora`, `time` o `schedule`
 
 Con esos tres campos alcanza para llenar `/clases`.
+
+## Campos esperados para precios
+
+La tabla de precios espera una fila por plan con estas columnas:
+
+- nombre del plan: `Plan`, `Nombre` o `name`
+- precio efectivo: `PrecioEfectivo`, `Precio`, `Valor` o `price`
+- precio transferencia: `PrecioTransferencia`, `precioTransferencia` o `Transferencia`
+- descripción opcional: `Descripcion`, `Descripción` o `description`
 
 ## Comportamiento
 

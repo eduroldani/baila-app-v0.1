@@ -8,6 +8,7 @@ const fallbackClassesByDay = [
         level: "Principiante",
         teacher: "Ana Torres",
         time: "18:00-19:00",
+        location: "Ven Street Center",
         isAvailable: true,
         availableSpots: 12,
       },
@@ -22,6 +23,7 @@ const fallbackClassesByDay = [
         level: "Todos los niveles",
         teacher: "Carlos Medina",
         time: "19:00-20:00",
+        location: "Ven Street Center",
         isAvailable: true,
         availableSpots: 10,
       },
@@ -36,6 +38,7 @@ const fallbackClassesByDay = [
         level: "Intermedio",
         teacher: "Lucia Gomez",
         time: "20:00-21:00",
+        location: "Ven Street Center",
         isAvailable: true,
         availableSpots: 8,
       },
@@ -50,6 +53,7 @@ const fallbackClassesByDay = [
         level: "Principiante",
         teacher: "Diego Ramirez",
         time: "18:00-19:00",
+        location: "Ven Street Center",
         isAvailable: true,
         availableSpots: 14,
       },
@@ -64,12 +68,50 @@ const fallbackClassesByDay = [
         level: "Intermedio",
         teacher: "Sofia Alvarez",
         time: "19:00-20:30",
+        location: "Ven Street Center",
         isAvailable: true,
         availableSpots: 6,
       },
     ],
   },
 ] as const;
+
+const fallbackPricingByPaymentMethod = {
+  transferencia: [
+    {
+      name: "Clase Suelta",
+      price: "$8.500",
+      description: "Para venir cuando quieras, sin compromiso mensual.",
+    },
+    {
+      name: "Plan Mensual",
+      price: "$32.000",
+      description: "Ocho clases por mes para sostener tu ritmo de entrenamiento.",
+    },
+    {
+      name: "Plan Ilimitado",
+      price: "$49.000",
+      description: "Acceso libre a todas las clases grupales del estudio.",
+    },
+  ],
+  efectivo: [
+    {
+      name: "Clase Suelta",
+      price: "$8.000",
+      description: "Valor promocional abonando en recepción el mismo día.",
+    },
+    {
+      name: "Plan Mensual",
+      price: "$30.000",
+      description: "Ocho clases por mes con descuento por pago en efectivo.",
+    },
+    {
+      name: "Plan Ilimitado",
+      price: "$46.000",
+      description: "Todas las clases grupales con la tarifa más baja del estudio.",
+    },
+  ],
+} as const;
 
 type AirtableRecord = {
   id: string;
@@ -88,6 +130,7 @@ type ClassItem = {
   level: string;
   teacher: string;
   time: string;
+  location: string;
   isAvailable: boolean;
   availableSpots: number | null;
 };
@@ -100,6 +143,7 @@ export type ClassesByDay = {
     level: string;
     teacher: string;
     time: string;
+    location: string;
     isAvailable: boolean;
     availableSpots: number | null;
   }[];
@@ -111,6 +155,16 @@ export type StudioStats = {
   disciplineCount: number;
   daysCount: number;
 };
+
+export type PaymentMethod = "transferencia" | "efectivo";
+
+export type PricingPlan = {
+  name: string;
+  price: string;
+  description: string;
+};
+
+export type PricingByPaymentMethod = Record<PaymentMethod, PricingPlan[]>;
 
 const dayOrder = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
@@ -159,6 +213,56 @@ function firstBoolean(fields: Record<string, unknown>, candidates: string[]) {
   return true;
 }
 
+function formatPrice(value: string | number) {
+  if (typeof value === "number") {
+    return `$${new Intl.NumberFormat("es-AR").format(value)}`;
+  }
+
+  return value.startsWith("$") ? value : `$${value}`;
+}
+
+async function fetchAirtableRecords(tableId: string, view?: string) {
+  const token = process.env.AIRTABLE_TOKEN;
+  const baseId = process.env.AIRTABLE_BASE_ID;
+
+  if (!token || !baseId || !tableId) {
+    return null;
+  }
+
+  const records: AirtableRecord[] = [];
+  let offset = "";
+
+  do {
+    const query = new URLSearchParams();
+    if (view) {
+      query.set("view", view);
+    }
+    if (offset) {
+      query.set("offset", offset);
+    }
+
+    const response = await fetch(
+      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableId)}?${query.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as AirtableResponse;
+    records.push(...(data.records ?? []));
+    offset = data.offset ?? "";
+  } while (offset);
+
+  return records;
+}
+
 function sortByTime(a: { time: string }, b: { time: string }) {
   return a.time.localeCompare(b.time);
 }
@@ -170,6 +274,7 @@ function normalizeClass(record: AirtableRecord): ClassItem | null {
   const teacher = firstString(record.fields, ["Profesor", "teacher"]);
   const rawDay = firstString(record.fields, ["Día", "Dia", "day"]);
   const time = firstString(record.fields, ["Horario", "Hora", "time", "schedule"]);
+  const location = firstString(record.fields, ["Ubicacion", "Ubicación", "Location", "location"]);
   const day = normalizedDays[rawDay.toLowerCase()] ?? rawDay;
   const availableSpots = firstNumber(record.fields, ["CuposDisponibles", "availableSpots"]);
   const isAvailableField = firstBoolean(record.fields, ["Disponible", "available"]);
@@ -186,6 +291,7 @@ function normalizeClass(record: AirtableRecord): ClassItem | null {
     teacher,
     day,
     time,
+    location,
     isAvailable,
     availableSpots,
   };
@@ -200,6 +306,7 @@ function groupClassesByDay(classes: ClassItem[]): ClassesByDay[] {
       level: string;
       teacher: string;
       time: string;
+      location: string;
       isAvailable: boolean;
       availableSpots: number | null;
     }[]
@@ -213,6 +320,7 @@ function groupClassesByDay(classes: ClassItem[]): ClassesByDay[] {
       level: danceClass.level,
       teacher: danceClass.teacher,
       time: danceClass.time,
+      location: danceClass.location,
       isAvailable: danceClass.isAvailable,
       availableSpots: danceClass.availableSpots,
     });
@@ -257,46 +365,19 @@ export function getStudioStats(classesByDay: ClassesByDay[]): StudioStats {
 }
 
 export async function getClassesByDay(): Promise<ClassesByDay[]> {
-  const token = process.env.AIRTABLE_TOKEN;
-  const baseId = process.env.AIRTABLE_BASE_ID;
   const tableId = process.env.AIRTABLE_TABLE_ID;
   const view = process.env.AIRTABLE_VIEW;
 
-  if (!token || !baseId || !tableId) {
+  if (!tableId) {
     return getFallbackClassesByDay();
   }
 
   try {
-    const records: AirtableRecord[] = [];
-    let offset = "";
+    const records = await fetchAirtableRecords(tableId, view);
 
-    do {
-      const query = new URLSearchParams();
-      if (view) {
-        query.set("view", view);
-      }
-      if (offset) {
-        query.set("offset", offset);
-      }
-
-      const response = await fetch(
-        `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableId)}?${query.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          cache: "no-store",
-        },
-      );
-
-      if (!response.ok) {
-        return getFallbackClassesByDay();
-      }
-
-      const data = (await response.json()) as AirtableResponse;
-      records.push(...(data.records ?? []));
-      offset = data.offset ?? "";
-    } while (offset);
+    if (!records) {
+      return getFallbackClassesByDay();
+    }
 
     const classes = records.map(normalizeClass).filter((value): value is ClassItem => value !== null);
 
@@ -307,5 +388,94 @@ export async function getClassesByDay(): Promise<ClassesByDay[]> {
     return groupClassesByDay(classes);
   } catch {
     return getFallbackClassesByDay();
+  }
+}
+
+function normalizePricingPlan(record: AirtableRecord) {
+  const name = firstString(record.fields, ["Plan", "Nombre", "name"]);
+  const description = firstString(record.fields, ["Descripcion", "Descripción", "description"]);
+  const efectivoNumericPrice = firstNumber(record.fields, ["PrecioEfectivo", "Precio", "price", "Valor"]);
+  const efectivoStringPrice = firstString(record.fields, ["PrecioEfectivo", "PrecioTexto", "Precio", "priceLabel"]);
+  const transferenciaNumericPrice = firstNumber(record.fields, [
+    "PrecioTransferencia",
+    "precioTransferencia",
+    "Transferencia",
+    "priceTransferencia",
+  ]);
+  const transferenciaStringPrice = firstString(record.fields, [
+    "PrecioTransferencia",
+    "precioTransferencia",
+    "Transferencia",
+    "priceTransferencia",
+  ]);
+
+  const efectivoPrice = efectivoNumericPrice ?? efectivoStringPrice;
+  const transferenciaPrice = transferenciaNumericPrice ?? transferenciaStringPrice;
+
+  if (!name || efectivoPrice === null || efectivoPrice === "" || transferenciaPrice === null || transferenciaPrice === "") {
+    return null;
+  }
+
+  return {
+    efectivo: {
+      name,
+      price: formatPrice(efectivoPrice),
+      description: description || "Consultá el detalle del plan con el estudio.",
+    },
+    transferencia: {
+      name,
+      price: formatPrice(transferenciaPrice),
+      description: description || "Consultá el detalle del plan con el estudio.",
+    },
+  };
+}
+
+export function getFallbackPricingByPaymentMethod(): PricingByPaymentMethod {
+  return {
+    transferencia: [...fallbackPricingByPaymentMethod.transferencia],
+    efectivo: [...fallbackPricingByPaymentMethod.efectivo],
+  };
+}
+
+export async function getPricingByPaymentMethod(): Promise<PricingByPaymentMethod> {
+  const tableId = process.env.AIRTABLE_PRICING_TABLE_ID;
+  const view = process.env.AIRTABLE_PRICING_VIEW;
+
+  if (!tableId) {
+    return getFallbackPricingByPaymentMethod();
+  }
+
+  try {
+    const records = await fetchAirtableRecords(tableId, view);
+
+    if (!records) {
+      return getFallbackPricingByPaymentMethod();
+    }
+
+    const normalizedPlans = records
+      .map(normalizePricingPlan)
+      .filter((value): value is NonNullable<ReturnType<typeof normalizePricingPlan>> => value !== null);
+
+    if (normalizedPlans.length === 0) {
+      return getFallbackPricingByPaymentMethod();
+    }
+
+    const grouped: PricingByPaymentMethod = {
+      transferencia: [],
+      efectivo: [],
+    };
+
+    for (const item of normalizedPlans) {
+      grouped.efectivo.push(item.efectivo);
+      grouped.transferencia.push(item.transferencia);
+    }
+
+    if (grouped.transferencia.length === 0 || grouped.efectivo.length === 0) {
+      return getFallbackPricingByPaymentMethod();
+    }
+
+    return grouped;
+  } catch {
+    return getFallbackPricingByPaymentMethod();
   }
 }
