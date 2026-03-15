@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { Navbar } from "@/components/navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bailá Dance Studio",
+  title: "Baila App v1",
   description: "Clases de danza para todos los niveles en un estudio cálido y enérgico.",
 };
 
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,141 +1,23 @@
-import Link from "next/link";
+import { getClassesByDay } from "@/lib/airtable";
 
-const classesByDay = [
-  {
-    day: "Lunes",
-    classes: [
-      {
-        name: "Urbano Inicial",
-        type: "Urbano",
-        level: "Inicial",
-        teacher: "Sofía Martínez",
-        time: "19:00 a 20:15",
-        price: "$8.500",
-      },
-      {
-        name: "Stretch & Flow",
-        type: "Movilidad",
-        level: "Todos los niveles",
-        teacher: "Julieta Mora",
-        time: "20:30 a 21:15",
-        price: "$7.500",
-      },
-    ],
-  },
-  {
-    day: "Martes",
-    classes: [
-      {
-        name: "Jazz Fusión",
-        type: "Jazz",
-        level: "Intermedio",
-        teacher: "Camila Rojas",
-        time: "18:30 a 19:45",
-        price: "$9.000",
-      },
-    ],
-  },
-  {
-    day: "Miércoles",
-    classes: [
-      {
-        name: "Técnica de Giros",
-        type: "Técnica",
-        level: "Inicial",
-        teacher: "Lucía Herrera",
-        time: "17:30 a 18:30",
-        price: "$7.500",
-      },
-      {
-        name: "Urbano Core",
-        type: "Urbano",
-        level: "Intermedio",
-        teacher: "Nicolás Vega",
-        time: "19:00 a 20:15",
-        price: "$9.000",
-      },
-    ],
-  },
-  {
-    day: "Jueves",
-    classes: [
-      {
-        name: "Heels Choreo",
-        type: "Heels",
-        level: "Intermedio",
-        teacher: "Valentina Cruz",
-        time: "19:30 a 20:45",
-        price: "$9.500",
-      },
-    ],
-  },
-  {
-    day: "Viernes",
-    classes: [
-      {
-        name: "Ritmos Latinos",
-        type: "Latino",
-        level: "Todos los niveles",
-        teacher: "Lucas Fernández",
-        time: "20:00 a 21:15",
-        price: "$8.500",
-      },
-    ],
-  },
-  {
-    day: "Sábado",
-    classes: [
-      {
-        name: "Urbano Avanzado",
-        type: "Urbano",
-        level: "Avanzado",
-        teacher: "Nicolás Vega",
-        time: "11:00 a 12:30",
-        price: "$10.000",
-      },
-    ],
-  },
-];
+export default async function ClassesPage() {
+  const classesByDay = await getClassesByDay();
 
-export default function ClassesPage() {
   return (
-    <main className="min-h-screen bg-white text-black">
-      <header className="sticky top-0 z-50 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5 lg:px-8">
-          <Link href="/" className="text-sm font-medium uppercase tracking-[0.3em] text-violet-700">
-            Bailá Dance Studio
-          </Link>
-          <nav className="flex items-center gap-3">
-            <Link
-              href="/clases"
-              className="rounded-full border border-black px-5 py-2 text-sm font-semibold transition hover:bg-black hover:text-white"
-            >
-              Clases
-            </Link>
-            <a
-              href="/#precios"
-              className="rounded-full bg-violet-700 px-5 py-2 text-sm font-semibold text-white transition hover:bg-violet-800"
-            >
-              Inscribirme
-            </a>
-          </nav>
-        </div>
-      </header>
-
+    <main className="min-h-screen bg-white pt-24 text-black">
       <section className="border-b border-black/10">
         <div className="mx-auto max-w-5xl px-6 py-8 lg:px-8">
           <div>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">Clases disponibles</h1>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-black/65">
+              Agenda semanal conectada a Airtable. Cada bloque muestra la clase, el horario, el
+              nivel y el profesor asignado.
+            </p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-12 lg:px-8">
-        <p className="max-w-2xl text-base leading-7 text-black/70">
-          Elegí la clase que mejor se adapte a tu nivel y horario. Los datos son mock por ahora,
-          pero la estructura ya está lista para conectarla a contenido real.
-        </p>
-
         <div className="mt-10 space-y-8">
           {classesByDay.map((dayGroup) => (
             <section key={dayGroup.day} className="overflow-hidden rounded-3xl border border-black/10">
@@ -143,31 +25,47 @@ export default function ClassesPage() {
                 <h2 className="text-2xl font-semibold tracking-tight">{dayGroup.day}</h2>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse bg-white">
-                  <thead>
-                    <tr className="border-b border-black/10 text-left text-sm text-black/50">
-                      <th className="px-6 py-4 font-medium">Clase</th>
-                      <th className="px-6 py-4 font-medium">Tipo</th>
-                      <th className="px-6 py-4 font-medium">Nivel</th>
-                      <th className="px-6 py-4 font-medium">Profesor</th>
-                      <th className="px-6 py-4 font-medium">Horario</th>
-                      <th className="px-6 py-4 font-medium">Precio</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dayGroup.classes.map((danceClass) => (
-                      <tr key={`${dayGroup.day}-${danceClass.name}`} className="border-b border-black/10">
-                        <td className="px-6 py-4 font-medium text-black">{danceClass.name}</td>
-                        <td className="px-6 py-4 text-black/70">{danceClass.type}</td>
-                        <td className="px-6 py-4 text-black/70">{danceClass.level}</td>
-                        <td className="px-6 py-4 text-black/70">{danceClass.teacher}</td>
-                        <td className="px-6 py-4 text-black/70">{danceClass.time}</td>
-                        <td className="px-6 py-4 font-medium text-black">{danceClass.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="bg-white px-5 py-3 sm:px-6">
+                <div className="space-y-3">
+                  {dayGroup.classes.map((danceClass) => (
+                    <article key={`${dayGroup.day}-${danceClass.name}`} className="rounded-2xl border border-black/10 px-4 py-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-base font-medium text-black sm:text-lg">{danceClass.name}</h3>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+                              {danceClass.level || "Nivel a definir"}
+                            </span>
+                            {danceClass.type ? (
+                              <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-black/70">
+                                {danceClass.type}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                        <p className="shrink-0 text-sm font-medium text-black/65">{danceClass.time}</p>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between gap-4">
+                        <p className="text-sm text-black/65">
+                          Profesor: <span className="font-medium text-black">{danceClass.teacher || "A confirmar"}</span>
+                        </p>
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            danceClass.isAvailable && (danceClass.availableSpots ?? 1) > 0
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-red-50 text-red-700"
+                          }`}
+                        >
+                          {danceClass.isAvailable && (danceClass.availableSpots ?? 1) > 0
+                            ? danceClass.availableSpots !== null
+                              ? `Cupo libre · ${danceClass.availableSpots}`
+                              : "Cupo libre"
+                            : "Lleno"}
+                        </span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
             </section>
           ))}
