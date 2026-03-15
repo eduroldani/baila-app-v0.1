@@ -18,6 +18,13 @@ export function addDays(date: Date, days: number) {
   return nextDate;
 }
 
+export function addMonths(date: Date, months: number) {
+  const nextDate = startOfLocalDay(date);
+  nextDate.setDate(1);
+  nextDate.setMonth(nextDate.getMonth() + months);
+  return nextDate;
+}
+
 export function parseDateInput(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return null;
@@ -44,6 +51,44 @@ export function formatDateInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+export function parseMonthInput(value: string) {
+  if (!/^\d{4}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const [year, month] = value.split("-").map(Number);
+  const parsed = new Date(year, month - 1, 1);
+
+  if (
+    Number.isNaN(parsed.getTime()) ||
+    parsed.getFullYear() !== year ||
+    parsed.getMonth() !== month - 1
+  ) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function formatMonthInput(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+export function formatMonthLabel(value: string) {
+  const selectedMonth = parseMonthInput(value);
+
+  if (!selectedMonth) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("es-AR", {
+    month: "long",
+    year: "numeric",
+  }).format(selectedMonth);
 }
 
 export function getMinimumRecoveryDate(today = new Date()) {

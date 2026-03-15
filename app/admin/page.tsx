@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminClassRecoveries } from "@/lib/class-recoveries";
+import { formatRecoveryDate, formatMonthInput, parseDateInput, parseMonthInput } from "@/lib/recoveries";
 import { getCurrentUserWithProfile } from "@/lib/supabase/queries";
 import { hasSupabaseEnv } from "@/lib/supabase/server";
 import { AdminRecoveriesManager } from "./admin-recoveries-manager";
+import { RecoveriesCalendar } from "./recoveries-calendar";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ month?: string; date?: string }>;
+}) {
   if (!hasSupabaseEnv()) {
     return (
       <main className="min-h-screen bg-white pt-24 text-black">
@@ -47,6 +53,16 @@ export default async function AdminPage() {
   }
 
   const { recoveries: rows, error } = await getAdminClassRecoveries();
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const selectedMonth = parseMonthInput(resolvedSearchParams.month || "")
+    ? resolvedSearchParams.month!
+    : formatMonthInput(new Date());
+  const selectedDate = parseDateInput(resolvedSearchParams.date || "")
+    ? resolvedSearchParams.date!
+    : null;
+  const recoveriesForSelectedDate = selectedDate
+    ? rows.filter((recovery) => recovery.recovery_date === selectedDate)
+    : rows;
 
   return (
     <main className="min-h-screen bg-white pt-24 text-black">
@@ -71,9 +87,27 @@ export default async function AdminPage() {
           </Link>
         </div>
 
+        {!error && rows.length > 0 ? (
+          <RecoveriesCalendar recoveries={rows} month={selectedMonth} selectedDate={selectedDate} />
+        ) : null}
+
         <div className="mt-8 overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
           <div className="border-b border-black/10 px-6 py-4">
-            <h2 className="text-xl font-semibold">Listado de recuperaciones</h2>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <h2 id="detalle-dia" className="text-xl font-semibold">
+                {selectedDate
+                  ? `Detalle del ${formatRecoveryDate(selectedDate)}`
+                  : "Listado de recuperaciones"}
+              </h2>
+              {selectedDate ? (
+                <Link
+                  href={`/admin?month=${selectedMonth}`}
+                  className="rounded-full border border-black/15 px-4 py-2 text-sm font-semibold text-black transition hover:bg-stone-100"
+                >
+                  Ver todo el mes
+                </Link>
+              ) : null}
+            </div>
           </div>
 
           {error ? (
@@ -84,9 +118,13 @@ export default async function AdminPage() {
             <div className="px-6 py-6 text-sm text-black/65">
               Todavía no hay recuperaciones registradas.
             </div>
+          ) : recoveriesForSelectedDate.length === 0 ? (
+            <div className="px-6 py-6 text-sm text-black/65">
+              No hay recuperaciones para esa fecha.
+            </div>
           ) : (
             <div className="px-6 py-6">
-              <AdminRecoveriesManager recoveries={rows} />
+              <AdminRecoveriesManager recoveries={recoveriesForSelectedDate} />
             </div>
           )}
         </div>
