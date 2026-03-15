@@ -1,8 +1,20 @@
 import { AuthForm } from "./auth-form";
-import { hasSupabaseEnv } from "@/lib/supabase/server";
+import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function AccessPage() {
+export default async function AccessPage() {
   const isConfigured = hasSupabaseEnv();
+
+  if (isConfigured) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      redirect("/alumnos");
+    }
+  }
 
   return (
     <main className="min-h-screen bg-white pt-24 text-black">
@@ -13,11 +25,11 @@ export default function AccessPage() {
               Acceso alumnos
             </p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Ingresá o creá tu cuenta para gestionar clases y documentación.
+              Ingresá o creá tu cuenta para reservar tu recuperación.
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-black/65">
-              Esta base deja listo el acceso para alumnos. Desde acá después podemos sumar
-              inscripciones a clases, carga de comprobantes y certificados médicos.
+              El flujo actual está pensado para que cada alumno elija una fecha, vea solo las
+              clases de ese día y anote qué recuperación va a tomar.
             </p>
           </div>
           {isConfigured ? (

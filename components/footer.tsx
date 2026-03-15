@@ -1,12 +1,18 @@
-export function Footer() {
+export function Footer({
+  accessHref,
+  accessLabel,
+}: {
+  accessHref: string;
+  accessLabel: string;
+}) {
   return (
     <footer className="border-t border-black/10 bg-white">
       <div className="mx-auto max-w-5xl px-6 py-8 lg:px-8">
         <div className="flex flex-col gap-4 text-sm text-black/60 md:flex-row md:items-center md:justify-between">
           <p>Baila Dance Studio</p>
           <div className="flex items-center gap-5">
-            <a href="/acceso" className="text-black/70 transition hover:text-black">
-              Login
+            <a href={accessHref} className="text-black/70 transition hover:text-black">
+              {accessLabel}
             </a>
             <a href="/condiciones-generales" className="text-black/70 transition hover:text-black">
               Condiciones generales

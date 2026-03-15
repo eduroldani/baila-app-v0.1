@@ -1,6 +1,6 @@
 # Supabase Setup
 
-Para activar login de alumnos en esta rama:
+Para activar login de alumnos y recuperaciones en esta rama:
 
 ## Variables de entorno
 
@@ -19,6 +19,7 @@ La base actual usa:
 
 - `/acceso` para login y alta de cuenta
 - `/alumnos` como página protegida
+- `/alumnos` para registrar recuperaciones por fecha
 - `middleware.ts` para refrescar sesión
 
 ## Configuración mínima en Supabase
@@ -34,15 +35,19 @@ La base actual usa:
 La base actual ya contempla:
 
 - `profiles`
-- `class_enrollments`
+- `class_recoveries`
+- `dependents`
 
 El flujo actual del alumno permite:
 
 - iniciar sesión
-- ver clases disponibles traídas desde Airtable
-- inscribirse a una clase
-- ver sus clases activas
-- cancelar una inscripción
+- guardar el nombre del titular
+- cargar personas a cargo con nombre y edad
+- elegir una fecha de recuperación con 2 días de anticipación
+- elegir quién recupera: el titular o una persona a cargo
+- ver solo las clases de Airtable que corresponden a ese día
+- guardar una recuperación
+- cancelar una recuperación futura
 
 ## Rol admin
 
@@ -59,5 +64,5 @@ where email = 'tu-email@dominio.com';
 ## Rutas
 
 - `/acceso` login y registro
-- `/alumnos` panel protegido
-- `/admin` panel protegido solo para `role = 'admin'`
+- `/alumnos` panel protegido para recuperar clases
+- `/admin` panel protegido solo para `role = 'admin'`, con listado de recuperaciones

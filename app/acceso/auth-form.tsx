@@ -59,7 +59,7 @@ export function AuthForm() {
         return;
       }
 
-      setMessage("Cuenta creada. Revisá tu email si tenés confirmación activada.");
+      setMessage("Cuenta creada. Ya podés entrar y anotar tu recuperación.");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getAdminClassRecoveries } from "@/lib/class-recoveries";
+import { getCurrentUserWithProfile } from "@/lib/supabase/queries";
 import { hasSupabaseEnv } from "@/lib/supabase/server";
-import { getAllProfiles, getCurrentUserWithProfile } from "@/lib/supabase/queries";
+import { AdminRecoveriesManager } from "./admin-recoveries-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +33,8 @@ export default async function AdminPage() {
           <div className="rounded-[2rem] border border-black/10 bg-stone-50 p-8 shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
             <h1 className="text-3xl font-semibold tracking-tight">Falta configurar perfiles</h1>
             <p className="mt-4 text-sm leading-7 text-black/65">
-              Para usar el panel admin necesitás crear la tabla `profiles` en Supabase y cargar el
-              esquema inicial.
+              Para usar el panel admin necesitás crear las tablas en Supabase y cargar el esquema
+              inicial.
             </p>
           </div>
         </section>
@@ -44,7 +46,7 @@ export default async function AdminPage() {
     redirect("/alumnos");
   }
 
-  const { profiles, error } = await getAllProfiles();
+  const { recoveries: rows, error } = await getAdminClassRecoveries();
 
   return (
     <main className="min-h-screen bg-white pt-24 text-black">
@@ -55,11 +57,10 @@ export default async function AdminPage() {
               Panel admin
             </p>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-              Gestión de alumnos
+              Recuperaciones de alumnos
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-black/65">
-              Desde acá el rol admin puede revisar estudiantes registrados y luego seguir con
-              inscripciones, pagos y documentación.
+              Acá vemos quién recupera, qué clase eligió y si la fecha ya pasó o sigue pendiente.
             </p>
           </div>
           <Link
@@ -72,43 +73,20 @@ export default async function AdminPage() {
 
         <div className="mt-8 overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
           <div className="border-b border-black/10 px-6 py-4">
-            <h2 className="text-xl font-semibold">Estudiantes</h2>
+            <h2 className="text-xl font-semibold">Listado de recuperaciones</h2>
           </div>
 
           {error ? (
             <div className="px-6 py-6 text-sm text-black/65">
-              No se pudo cargar la lista de perfiles.
+              No se pudo cargar la lista de recuperaciones.
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="px-6 py-6 text-sm text-black/65">
+              Todavía no hay recuperaciones registradas.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="border-b border-black/10 text-left text-sm text-black/55">
-                    <th className="px-6 py-4 font-medium">Nombre</th>
-                    <th className="px-6 py-4 font-medium">Email</th>
-                    <th className="px-6 py-4 font-medium">Rol</th>
-                    <th className="px-6 py-4 font-medium">Alta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {profiles.map((student) => (
-                    <tr key={student.id} className="border-b border-black/10 text-sm">
-                      <td className="px-6 py-4 font-medium text-black">
-                        {student.full_name || "Sin nombre"}
-                      </td>
-                      <td className="px-6 py-4 text-black/65">{student.email}</td>
-                      <td className="px-6 py-4">
-                        <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-black">
-                          {student.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-black/65">
-                        {new Date(student.created_at).toLocaleDateString("es-AR")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="px-6 py-6">
+              <AdminRecoveriesManager recoveries={rows} />
             </div>
           )}
         </div>

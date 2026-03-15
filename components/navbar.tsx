@@ -11,7 +11,13 @@ function WhatsAppIcon() {
   );
 }
 
-export function Navbar() {
+export function Navbar({
+  accessHref,
+  accessLabel,
+}: {
+  accessHref: string;
+  accessLabel: string;
+}) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -45,10 +51,10 @@ export function Navbar() {
               Alumnos
             </a>
             <Link
-              href="/acceso"
+              href={accessHref}
               className="text-sm font-medium text-black/70 transition hover:text-black"
             >
-              Acceso
+              {accessLabel}
             </Link>
             <Link
               href="/condiciones-generales"
@@ -110,11 +116,11 @@ export function Navbar() {
               Área alumnos
             </a>
             <Link
-              href="/acceso"
+              href={accessHref}
               onClick={() => setIsMenuOpen(false)}
               className="rounded-2xl px-4 py-3 text-sm font-medium text-black transition hover:bg-stone-100"
             >
-              Acceso
+              {accessLabel}
             </Link>
             <Link
               href="/condiciones-generales"

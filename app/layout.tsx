@@ -8,17 +8,20 @@ export const metadata: Metadata = {
   description: "Clases de danza para todos los niveles en un estudio cálido y enérgico.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const accessHref = "/acceso";
+  const accessLabel = "Acceso";
+
   return (
     <html lang="es">
       <body>
-        <Navbar />
+        <Navbar accessHref={accessHref} accessLabel={accessLabel} />
         {children}
-        <Footer />
+        <Footer accessHref={accessHref} accessLabel={accessLabel} />
       </body>
     </html>
   );
